@@ -44,9 +44,26 @@ class HomeController extends AbstractController
     public function checkAllParameter(Request $request, $dm){
         $query = $request->query;
         $array = array();
+        $version = "";
         $hitType = "";
+        $documentLocation = "";
+        $documentReferer = "";
+        $wizbiiCreatorType = "";
+        $wizbiiUserId = "";
+        $eventCategory = "";
+        $eventAction = "";
+        $eventLabel = "";
+        $eventValue = "";
+        $trackingId = "";
         $dataSource = "";
-
+        $campaignName = "";
+        $campaignSource = "";
+        $campaignMedium = "";
+        $campaignKeyword = "";
+        $campaignContent = "";
+        $screenName = "";
+        $applicationName = "";
+        $applicationVersion = "";
 
         // version
         if(($query->has('v')== false) ||
@@ -54,7 +71,7 @@ class HomeController extends AbstractController
         {
             return new JsonResponse(array('Status' => '400 : Parameter v must be equal to 1 or exist'));
         }
-        array_push($array, $query->get('v'));
+        $version =  $query->get('v');
 
         // hit type
         if (($query->has('t')== false) ||
@@ -63,7 +80,6 @@ class HomeController extends AbstractController
             return new JsonResponse(array('Status' => '400 : Parameter t must be equal to pageview, screenview, event or exist'));
         }
         $hitType = $query->get('t');
-        array_push($array, $query->get('t'));
 
 
         // document location
@@ -73,8 +89,7 @@ class HomeController extends AbstractController
             {
                 return new JsonResponse(array('Status' => '400 : the document location must have a valid URL'));
             }
-            array_push($array, $query->get('dl'));
-
+            $documentLocation = $query->get('dl');
         }
 
         // document referer
@@ -84,7 +99,7 @@ class HomeController extends AbstractController
             {
                 return new JsonResponse(array('Status' => '400 : the document referer must have a valid URL'));
             }
-            array_push($array, $query->get('dr'));
+            $documentReferer = $query->get('dr');
         }
 
         if($hitType == "screenview")
@@ -96,7 +111,7 @@ class HomeController extends AbstractController
             {
                 return new JsonResponse(array('Status' => '400 : Parameter wct must be equal to profile, recruiter, visitor, wizbii_employee  or exist'));
             }
-            array_push($array, $query->get('wct'));
+            $wizbiiCreatorType = $query->get('wct');
 
             // wizbii user id
             if($query->has('wui')==false)
@@ -108,23 +123,23 @@ class HomeController extends AbstractController
                     return new JsonResponse(array('Status' => '400 : Parameter wui must respect format slug firstname-lastname'));
                 }
             }
-            array_push($array, $query->get('wui'));
+            $wizbiiUserId = $query->get('wui');
 
             // screen name
             if($query->has('sn')==false)
             {
                 return new JsonResponse(array('Status' => '400 : Parameter sn must exist'));
             }
-            array_push($array, $query->get('sn'));
+            $screenName = $query->get('sn');
         }else
-            {
+        {
             // wizbii creator type
             if (($query->has('wct')) &&
                 !in_array($query->get('wct'), array("profile", "recruiter", "visitor", "wizbii_employee")))
             {
                 return new JsonResponse(array('Status' => '400 : Parameter wct must be equal to profile, recruiter, visitor, wizbii_employee  or exist'));
             }
-            array_push($array, $query->has('wct')? $query->get('wct'): "");
+            $wizbiiCreatorType =  $query->has('wct')? $query->get('wct'): "";
 
             // wizbii user id
             $regex = '/^[aA-zZ]+-[aA-zZ]+$/';
@@ -132,47 +147,45 @@ class HomeController extends AbstractController
                 (!preg_match($regex, $query->get('wui')))){
                 return new JsonResponse(array('Status' => '400 : Parameter wui must respect format slug firstname-lastname'));
             }
-            array_push($array, $query->has('wui')? $query->get('wui'): "");
+            $wizbiiUserId = $query->has('wui')? $query->get('wui'): "";
 
-            array_push($array, $query->has('sn')? $query->get('sn'): "");
-
-            }
+            $screenName = $query->has('sn')? $query->get('sn'): "";
+        }
 
         if($hitType == "event")
         {
             // event category
-            if(($query->has('ec')== false) && (strlen($query->get('ec'))==0))
+            if(($query->has('ec')== false) || (strlen($query->get('ec'))==0))
             {
                 return new JsonResponse(array('Status' => '400 : Parameter ec must exist and not be empty'));
             }
-            array_push($array, $query->get('ec'));
-
+            $eventCategory = $query->get('ec');
 
             // event action
-            if(($query->has('ea')== false) && (strlen($query->get('ea'))==0))
+            if(($query->has('ea')== false) || (strlen($query->get('ea'))==0))
             {
                 return new JsonResponse(array('Status' => '400 : Parameter ea must exist and not be empty'));
             }
-            array_push($array, $query->get('ae'));
+            $eventAction = $query->get('ea');
         }else{
             // event category
-            if(($query->has('ec')) && (strlen($query->get('ec'))==0))
+            if(($query->has('ec')== false) || (strlen($query->get('ec'))==0))
             {
                 return new JsonResponse(array('Status' => '400 : Parameter ec must exist and not be empty'));
             }
-            array_push($array, $query->has('ec')? $query->get('ec'): "");
+            $eventCategory = $query->get('ec');
 
             // event action
-            if(($query->has('ea')) && (strlen($query->get('ea'))==0))
+            if(($query->has('ea')== false) || (strlen($query->get('ea'))==0))
             {
                 return new JsonResponse(array('Status' => '400 : Parameter ea must exist and not be empty'));
             }
-            array_push($array, $query->has('ea')? $query->get('ea'): "");
+            $eventAction = $query->get('ea');
         }
 
         // event label
         if($query->has('el')){
-            array_push($array, $query->get('el'));
+            $eventLabel = $query->get('el');
         }
 
         // event value
@@ -184,7 +197,7 @@ class HomeController extends AbstractController
             {
                 return new JsonResponse(array('Status' => '400 : Parameter ev must be a positive number'));
             }
-            array_push($array, $query->get('ev'));
+            $eventValue = $query->get('ev');
         }
 
         // tracking id
@@ -192,9 +205,9 @@ class HomeController extends AbstractController
         if(($query ->has('tid') == false) ||
             (!preg_match($regex, $query->get('tid'))))
         {
-            return new JsonResponse(array('Status' => '400 : Parameter tid  must exist or respect format UA-XXXX-Y'));
+            return new JsonResponse(array('Status' => '400 : Parameter tid  must exist or respect format UA-XXXX-Y',));
         }
-        array_push($array, $query->get('tid'));
+        $trackingId = $query->get('tid');
 
         //data source
         if (($query->has('ds')== false) ||
@@ -203,36 +216,35 @@ class HomeController extends AbstractController
             return new JsonResponse(array('Status' => '400 : Parameter ds must be equal to web, apps, backend or exist'));
         }
         $dataSource = $query->get('ds');
-        array_push($array, $query->get('ds'));
 
         // campaign name
         if($query->has('cn'))
-            array_push($array, $query->get('cn'));
+            $campaignName = $query->get('cn');
 
         // campaign source
         if($query->has('cs'))
-            array_push($array, $query->get('cs'));
+            $campaignSource = $query->get('cs');
 
         // campaign medium
         if($query->has('cm'))
-            array_push($array, $query->get('cm'));
+            $campaignMedium = $query->get('cm');
 
         // campaign keyword
         if($query->has('ck'))
-            array_push($array, $query->get('ck'));
+            $campaignKeyword = $query->get('ck');
 
         // campaign content
         if($query->has('cn'))
-            array_push($array, $query->get('cn'));
+            $campaignContent = $query->get('cn');
 
         // application name
         if($dataSource == "web"){
             if($query->get('an') == false){
                 return new JsonResponse(array('Status' => '400 : Parameter an must exist if data source equals to web'));
             }
-            array_push($array, $query->get('an'));
+            $applicationName = $query->get('an');
         }else{
-            array_push($array, $query->has('an')? $query->get('an'): "");
+            $applicationName = $query->has('an')? $query->get('an'): "";
         }
 
         // application version
@@ -240,17 +252,15 @@ class HomeController extends AbstractController
         if($query->has('av') && !preg_match($regex, $query->get('av'))){
             return new JsonResponse(array('Status' => '400 : Parameter av must respect format version'));
         }
-        array_push($array, $query->has('av')? $query->get('av'): "");
+        $applicationVersion = $query->has('av')? $query->get('av') : "";
 
+        array_push($array,$version,$hitType,$documentLocation,$documentReferer,$wizbiiCreatorType,$wizbiiUserId,$eventCategory,$eventAction,$eventLabel,$eventValue,$trackingId,$dataSource,$campaignName,$campaignSource,$campaignMedium,$campaignKeyword,$campaignContent,$screenName,$applicationName,$applicationVersion);
         $this->createElemDb($array,$dm);
         return new JsonResponse($array,200);
     }
 
     public function createElemDb($array, $dm){
 
-        if(sizeof($array)+1 == 20){
-            array_push($array,"");
-        }
         $element = new Element();
         $element->setVersion($array[0]);
         $element->setHitType($array[1]);
@@ -268,7 +278,7 @@ class HomeController extends AbstractController
         $element->setCampaignSource($array[13]);
         $element->setCampaignMedium($array[14]);
         $element->setCampaignKeyword($array[15]);
-        $element->getCampaignContent($array[16]);
+        $element->setCampaignContent($array[16]);
         $element->setScreenName($array[17]);
         $element->setApplicationName($array[18]);
         $element->setApplicationVersion($array[19]);
