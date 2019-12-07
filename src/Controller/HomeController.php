@@ -5,7 +5,6 @@ namespace App\Controller;
 
 
 use App\Document\Element;
-use App\Document\User;
 use Doctrine\ODM\MongoDB\MongoDBException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,30 +15,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class HomeController extends AbstractController
 {
-
-    /**
-     * @Route("/mongoTest",methods={"GET"})
-     * @param DocumentManager $dm
-     * @return MongoDBException|\Exception|JsonResponse
-     */
-    public function mongoTest(DocumentManager $dm)
-    {
-
-        $user = new User();
-        $user->setEmail("hello@medium.com");
-        $user->setFirstname("Matt");
-        $user->setLastname("Matt");
-        $user->setPassword(md5("123456"));
-
-
-        $dm->persist($user);
-        try {
-            $dm->flush();
-        } catch (MongoDBException $e) {
-            return $e;
-        }
-        return new JsonResponse(array('Status' => 'OK'));
-    }
 
     /**
      * @Route("/collect", methods={"GET"})
@@ -61,7 +36,6 @@ class HomeController extends AbstractController
      * @return JsonResponse
      */
     public function postCollect(Request $request,DocumentManager $dm){
-
 
     }
 
