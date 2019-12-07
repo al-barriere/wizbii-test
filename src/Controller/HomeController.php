@@ -248,6 +248,9 @@ class HomeController extends AbstractController
 
     public function createElemDb($array, $dm){
 
+        if(sizeof($array)+1 == 20){
+            array_push($array,"");
+        }
         $element = new Element();
         $element->setVersion($array[0]);
         $element->setHitType($array[1]);
